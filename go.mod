@@ -1,4 +1,4 @@
-module github.com/pangpanglabs/echoswagger/v2
+module github.com/rsrdesarrollo/echoswagger/v2
 
 go 1.12
 
