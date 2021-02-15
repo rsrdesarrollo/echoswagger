@@ -1,6 +1,8 @@
 package echoswagger
 
 import (
+	"net/http"
+	"path"
 	"reflect"
 	"strconv"
 	"sync"
@@ -248,43 +250,45 @@ func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 	return r
 }
 
-func (r *Root) Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.Add(method, path, h, m...))
+func (r *Root) Add(method, relPath string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	var fullPath = path.Join(r.spec.BasePath, relPath)
+	return r.appendRoute(r.echo.Add(method, fullPath, h, m...))
 }
 
 func (r *Root) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.GET(path, h, m...))
+	return r.Add(http.MethodGet, path, h, m...)
 }
 
 func (r *Root) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.POST(path, h, m...))
+	return r.Add(http.MethodPost, path, h, m...)
 }
 
 func (r *Root) PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.PUT(path, h, m...))
+	return r.Add(http.MethodPut, path, h, m...)
 }
 
 func (r *Root) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.DELETE(path, h, m...))
+	return r.Add(http.MethodDelete, path, h, m...)
 }
 
 func (r *Root) OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.OPTIONS(path, h, m...))
+	return r.Add(http.MethodOptions, path, h, m...)
 }
 
 func (r *Root) HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.HEAD(path, h, m...))
+	return r.Add(http.MethodHead, path, h, m...)
 }
 
 func (r *Root) PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(r.echo.PATCH(path, h, m...))
+	return r.Add(http.MethodPatch, path, h, m...)
 }
 
-func (r *Root) Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup {
+func (r *Root) Group(name, relPrefix string, m ...echo.MiddlewareFunc) ApiGroup {
 	if name == "" {
 		panic("echoswagger: invalid name of ApiGroup")
 	}
-	echoGroup := r.echo.Group(prefix, m...)
+	var fullPrefix = path.Join(r.spec.BasePath, relPrefix)
+	echoGroup := r.echo.Group(fullPrefix, m...)
 	group := group{
 		echoGroup: echoGroup,
 		routers: routers{
