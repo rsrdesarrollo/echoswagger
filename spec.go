@@ -3,7 +3,6 @@ package echoswagger
 import (
 	"encoding/xml"
 	"net/http"
-	"net/url"
 	"reflect"
 
 	"github.com/labstack/echo/v4"
@@ -21,15 +20,7 @@ func (r *Root) specHandler(docPath string) echo.HandlerFunc {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		var basePath string
-		if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
-			basePath = trimSuffixSlash(uri.Path, docPath)
-			spec.Host = uri.Host
-		} else {
-			basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
-			spec.Host = c.Request().Host
-		}
-		spec.BasePath = basePath
+		spec.Host = c.Request().Host
 		return c.JSON(http.StatusOK, spec)
 	}
 }

@@ -55,14 +55,6 @@ const SwaggerUIContent = `{{define "swagger"}}
       var spec = specStr ? JSON.parse(specStr) : undefined
       if (spec) {
         spec.host = window.location.host
-        var docPath = "{{.docPath}}"
-        var basePath = window.location.pathname
-        if (!docPath.endsWith("/")) { docPath += "/" }
-        if (!basePath.endsWith("/")) { basePath += "/" }
-        if (basePath.endsWith(docPath)) {
-          basePath = basePath.slice(0, -docPath.length)
-        }
-        spec.basePath = basePath
       }
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
