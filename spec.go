@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"net/http"
 	"reflect"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -72,7 +73,8 @@ func (r *Root) transfer(a *api) error {
 		return err
 	}
 
-	path := toSwaggerPath(a.route.Path)
+	path := strings.TrimPrefix(toSwaggerPath(a.route.Path), r.spec.BasePath)
+
 	if len(a.operation.Responses) == 0 {
 		a.operation.Responses["default"] = &Response{
 			Description: "successful operation",
