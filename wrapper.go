@@ -2,7 +2,6 @@ package echoswagger
 
 import (
 	"net/http"
-	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -229,7 +228,7 @@ func New(e *echo.Echo, basePath string, docPath string, i *Info) ApiRoot {
 	}
 
 	basePath = strings.TrimSuffix(basePath, "/")
-	docPath = path.Join(basePath, docPath)
+	docPath = connectPath(basePath, docPath)
 
 	if i == nil {
 		i = &Info{
@@ -256,7 +255,7 @@ func New(e *echo.Echo, basePath string, docPath string, i *Info) ApiRoot {
 }
 
 func (r *Root) Add(method, relPath string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	var fullPath = path.Join(r.spec.BasePath, relPath)
+	var fullPath = connectPath(r.spec.BasePath, relPath)
 	return r.appendRoute(r.echo.Add(method, fullPath, h, m...))
 }
 
@@ -292,7 +291,7 @@ func (r *Root) Group(name, relPrefix string, m ...echo.MiddlewareFunc) ApiGroup 
 	if name == "" {
 		panic("echoswagger: invalid name of ApiGroup")
 	}
-	var fullPrefix = path.Join(r.spec.BasePath, relPrefix)
+	var fullPrefix = connectPath(r.spec.BasePath, relPrefix)
 	echoGroup := r.echo.Group(fullPrefix, m...)
 	group := group{
 		echoGroup: echoGroup,
