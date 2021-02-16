@@ -5,6 +5,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/labstack/echo/v4"
@@ -222,10 +223,13 @@ type api struct {
 
 // New creates ApiRoot instance.
 // Multiple ApiRoot are allowed in one project.
-func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
+func New(e *echo.Echo, basePath string, docPath string, i *Info) ApiRoot {
 	if e == nil {
 		panic("echoswagger: invalid Echo instance")
 	}
+
+	basePath = strings.TrimSuffix(basePath, "/")
+	docPath = path.Join(basePath, docPath)
 
 	if i == nil {
 		i = &Info{
@@ -239,6 +243,7 @@ func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 			Info:                i,
 			SecurityDefinitions: make(map[string]*SecurityDefinition),
 			Definitions:         make(map[string]*JSONSchema),
+			BasePath:            basePath,
 		},
 		routers: routers{
 			defs: &defs,
